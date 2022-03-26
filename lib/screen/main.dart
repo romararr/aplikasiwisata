@@ -11,50 +11,128 @@ class MainScreen extends StatelessWidget {
         appBar: AppBar(
           title: Text("Aplikasi Wisata"),
         ),
-        body: ListView.builder(
-            itemCount: tourismPlaceList.length,
-            itemBuilder: (context, index) {
-              final TourismPlace place = tourismPlaceList[index];
-              return InkWell(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return DetailScreen(place: place);
-                  }));
-                },
-                child: Card(
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: Image.asset(place.imageAsset),
+        body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints constrains) {
+            if (constrains.maxWidth <= 600) {
+              return TourismPlaceList();
+            } else if (constrains.maxWidth <= 1200) {
+              return TourismPlaceGrid(
+                gridCount: 4,
+              );
+            } else {
+              return TourismPlaceGrid(
+                gridCount: 6,
+              );
+            }
+          },
+        ));
+  }
+}
+
+class TourismPlaceList extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+        itemCount: tourismPlaceList.length,
+        itemBuilder: (context, index) {
+          final TourismPlace place = tourismPlaceList[index];
+          return InkWell(
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return DetailScreen(place: place);
+              }));
+            },
+            child: Card(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Image.asset(place.imageAsset),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            place.name,
+                            style: const TextStyle(
+                                fontSize: 16.0, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(
+                            height: 5,
+                          ),
+                          Text(place.location)
+                        ],
                       ),
-                      Expanded(
-                        flex: 3,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                place.name,
-                                style: const TextStyle(
-                                    fontSize: 16.0,
-                                    fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Text(place.location)
-                            ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        });
+  }
+}
+
+class TourismPlaceGrid extends StatelessWidget {
+  final int gridCount;
+
+  TourismPlaceGrid({required this.gridCount});
+  @override
+  Widget build(BuildContext context) {
+    return Scrollbar(
+        isAlwaysShown: true,
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: GridView.count(
+              crossAxisCount: 4,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              children: tourismPlaceList.map((place) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return DetailScreen(place: place);
+                    }));
+                  },
+                  child: Card(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                            child: Image.asset(
+                          place.imageAsset,
+                          fit: BoxFit.cover,
+                        )),
+                        SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8.0),
+                          child: Text(
+                            place.name,
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding:
+                              const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                          child: Text(
+                            place.location,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }));
+                );
+              }).toList()),
+        ));
   }
 }
